@@ -236,21 +236,53 @@ a salary greater than $70K
 
 
 
-SELECT
-quarter1_job_postings.job_title_short,
-quarter1_job_postings.job_location,
-quarter1_job_postings.job_via,
-quarter1_job_postings.job_posted_date::DATE,
-quarter1_job_postings.salary_year_avg
-FROM (
-SELECT * from january_jobs WHERE salary_year_avg > 70000
-UNION ALL
-SELECT * from feb_jobs WHERE salary_year_avg > 70000
-UNION ALL
-SELECT * from march_jobs WHERE salary_year_avg > 70000
-) As quarter1_job_postings
-WHERE quarter1_job_postings.job_location is not NULL
-ORDER BY quarter1_job_postings.salary_year_avg DESC
+-- SELECT
+-- quarter1_job_postings.job_title_short,
+-- quarter1_job_postings.job_location,
+-- quarter1_job_postings.job_via,
+-- quarter1_job_postings.job_posted_date::DATE,
+-- quarter1_job_postings.salary_year_avg
+-- FROM (
+-- SELECT * from january_jobs WHERE salary_year_avg > 70000
+-- UNION ALL
+-- SELECT * from feb_jobs WHERE salary_year_avg > 70000
+-- UNION ALL
+-- SELECT * from march_jobs WHERE salary_year_avg > 70000
+-- ) As quarter1_job_postings
+-- WHERE quarter1_job_postings.job_location is not NULL
+-- ORDER BY quarter1_job_postings.salary_year_avg DESC
+
+
+
+
+/*
+Question: What are the top-paying data analyst jobs?
+- Identify the top 10 highest-paying Data Analyst roles that are available reotely.
+- Focuses on job postings with specified salaries (remove nulls).
+- why? Highlight the top-paying opportunities for Data Analysts, offering insights into employment opportunities.
+
+*/
+
+
+SELECT job_id,
+job_title,
+job_location,
+company_dim.name as company_name,
+job_schedule_type,
+salary_year_avg,
+job_posted_date::DATE
+FROM
+    job_postings_fact
+    INNER JOIN company_dim
+    ON
+    company_dim.company_id = job_postings_fact.company_id
+WHERE
+    job_title LIKE '%Data Analyst%'
+    and salary_year_avg is not NULL
+    and job_location = 'Anywhere'
+    ORDER BY salary_year_avg desc 
+    LIMIT 10;
+    
 
 
 
