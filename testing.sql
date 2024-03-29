@@ -132,19 +132,52 @@ Label new column as follows:
 --- subqueries at a glance
 
 
-SELECT
-    jpf.company_id,
-    jpf.job_no_degree_mention,
-    cd.name as company_name,
-    COUNT(job_no_degree_mention = TRUE) as number_of_no_degree_count
-FROM
-    job_postings_fact as jpf
-    LEFT JOIN company_dim as cd ON
-    cd.company_id = jpf.company_id
-WHERE
-    job_no_degree_mention = TRUE
-GROUP BY
-company_name, jpf.company_id, jpf.job_no_degree_mention
-ORDER BY
-number_of_no_degree_count DESC
-LIMIT 100
+-- SELECT
+--     jpf.company_id,
+--     jpf.job_no_degree_mention,
+--     cd.name as company_name,
+--     COUNT(job_no_degree_mention = TRUE) as number_of_no_degree_count
+-- FROM
+--     job_postings_fact as jpf
+--     LEFT JOIN company_dim as cd ON
+--     cd.company_id = jpf.company_id
+-- WHERE
+--     job_no_degree_mention = TRUE
+-- GROUP BY
+-- company_name, jpf.company_id, jpf.job_no_degree_mention
+-- ORDER BY
+-- number_of_no_degree_count DESC 
+-- LIMIT 100
+
+
+
+
+
+---- CTE - Common Table Expression at a glance
+
+/*
+Find the companies that have the most job openings.
+- Get the total number of job postings per company id (job_posting_fact)
+- Return the total number of jobs with the company name (company_dim)
+*/
+
+
+--- in cte we can divide the query
+
+
+WITH company_job_count AS (
+    SELECT
+        company_id,
+        COUNT(*) AS job_count
+    FROM
+        job_postings_fact
+    GROUP BY
+        company_id
+)
+
+SELECT company_dim.name as company_name,
+COALESCE(company_job_count.job_count, 0) AS job_count
+from company_dim
+left join company_job_count on
+company_dim.company_id = company_job_count.company_id
+ORDER BY company_job_count.job_count DESC;
