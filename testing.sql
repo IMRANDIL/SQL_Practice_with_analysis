@@ -165,19 +165,56 @@ Find the companies that have the most job openings.
 --- in cte we can divide the query
 
 
-WITH company_job_count AS (
-    SELECT
-        company_id,
-        COUNT(*) AS job_count
-    FROM
-        job_postings_fact
-    GROUP BY
-        company_id
+-- WITH company_job_count AS (
+--     SELECT
+--         company_id,
+--         COUNT(*) AS job_count
+--     FROM
+--         job_postings_fact
+--     GROUP BY
+--         company_id
+-- )
+
+-- SELECT company_dim.name as company_name,
+-- COALESCE(company_job_count.job_count, 0) AS job_count ---Used COALESCE(company_job_count.job_count, 0) to handle cases where there are no matching job counts for a company, defaulting to 0.
+-- from company_dim
+-- left join company_job_count on
+-- company_dim.company_id = company_job_count.company_id
+-- ORDER BY company_job_count.job_count DESC;
+
+
+
+
+
+
+-----again CTE with some more example
+
+
+/*
+Find the count of the number of remote job postings per skill
+- Display the top 5 skills by their demand in remote jobs
+- Include skill ID, name, and count of postings requiring the skill
+
+*/
+
+
+
+--- why we need to choose skills_job_dim ..as it has skill_id and job_id both is there..
+
+with skill_info as (
+
+SELECT sjd.skill_id,count(*) as skill_count from skills_job_dim as sjd
+INNER JOIN job_postings_fact as jpf on 
+jpf.job_id = sjd.job_id
+WHERE jpf.job_work_from_home = TRUE
+GROUP BY sjd.skill_id
+
+
 )
 
-SELECT company_dim.name as company_name,
-COALESCE(company_job_count.job_count, 0) AS job_count
-from company_dim
-left join company_job_count on
-company_dim.company_id = company_job_count.company_id
-ORDER BY company_job_count.job_count DESC;
+SELECT sd.skill_id, sd.skills, si.skill_count from skill_info as si
+INNER JOIN skills_dim as sd
+on sd.skill_id = si.skill_id
+ORDER BY si.skill_count desc
+LIMIT 5
+;
