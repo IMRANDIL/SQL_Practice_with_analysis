@@ -201,20 +201,60 @@ Find the count of the number of remote job postings per skill
 
 --- why we need to choose skills_job_dim ..as it has skill_id and job_id both is there..
 
-with skill_info as (
+-- with skill_info as (
 
-SELECT sjd.skill_id,count(*) as skill_count from skills_job_dim as sjd
-INNER JOIN job_postings_fact as jpf on 
-jpf.job_id = sjd.job_id
-WHERE jpf.job_work_from_home = TRUE
-GROUP BY sjd.skill_id
+-- SELECT sjd.skill_id,count(*) as skill_count from skills_job_dim as sjd
+-- INNER JOIN job_postings_fact as jpf on 
+-- jpf.job_id = sjd.job_id
+-- WHERE jpf.job_work_from_home = TRUE
+-- GROUP BY sjd.skill_id
 
 
-)
+-- )
 
-SELECT sd.skill_id, sd.skills, si.skill_count from skill_info as si
-INNER JOIN skills_dim as sd
-on sd.skill_id = si.skill_id
-ORDER BY si.skill_count desc
-LIMIT 5
-;
+-- SELECT sd.skill_id, sd.skills, si.skill_count from skill_info as si
+-- INNER JOIN skills_dim as sd
+-- on sd.skill_id = si.skill_id
+-- ORDER BY si.skill_count desc
+-- LIMIT 5
+-- ;
+
+
+
+
+--union and union all practice below
+
+/*
+Find job postings from the first quarter that have 
+a salary greater than $70K
+
+- combine job posting tables from the first quarter of 2023 (Jan-Mar)
+- Get job posting with an average yearly salary > $70,000
+
+*/
+
+
+
+
+SELECT
+quarter1_job_postings.job_title_short,
+quarter1_job_postings.job_location,
+quarter1_job_postings.job_via,
+quarter1_job_postings.job_posted_date::DATE,
+quarter1_job_postings.salary_year_avg
+FROM (
+SELECT * from january_jobs WHERE salary_year_avg > 70000
+UNION ALL
+SELECT * from feb_jobs WHERE salary_year_avg > 70000
+UNION ALL
+SELECT * from march_jobs WHERE salary_year_avg > 70000
+) As quarter1_job_postings
+WHERE quarter1_job_postings.job_location is not NULL
+ORDER BY quarter1_job_postings.salary_year_avg DESC
+
+
+
+
+
+
+
