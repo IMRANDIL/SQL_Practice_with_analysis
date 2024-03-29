@@ -110,19 +110,41 @@ Label new column as follows:
 
 
 
-SELECT 
-COUNT(job_id) as number_of_jobs,
-job_location, 
-job_title_short,
-CASE
-WHEN job_location = 'Anywhere' THEN 'Remote'
-WHEN job_location = 'New York, NY' THEN 'Local'
-ELSE 'Onsite'
-END AS location_category
-from 
-job_postings_fact 
+-- SELECT 
+-- COUNT(job_id) as number_of_jobs,
+-- job_location, 
+-- job_title_short,
+-- CASE
+-- WHEN job_location = 'Anywhere' THEN 'Remote'
+-- WHEN job_location = 'New York, NY' THEN 'Local'
+-- ELSE 'Onsite'
+-- END AS location_category
+-- from 
+-- job_postings_fact 
+-- GROUP BY
+-- location_category, job_location, job_title_short
+-- ORDER BY
+-- number_of_jobs DESC
+-- limit 100;
+
+
+
+--- subqueries at a glance
+
+
+SELECT
+    jpf.company_id,
+    jpf.job_no_degree_mention,
+    cd.name as company_name,
+    COUNT(job_no_degree_mention = TRUE) as number_of_no_degree_count
+FROM
+    job_postings_fact as jpf
+    LEFT JOIN company_dim as cd ON
+    cd.company_id = jpf.company_id
+WHERE
+    job_no_degree_mention = TRUE
 GROUP BY
-location_category, job_location, job_title_short
+company_name, jpf.company_id, jpf.job_no_degree_mention
 ORDER BY
-number_of_jobs DESC
-limit 100;
+number_of_no_degree_count DESC
+LIMIT 100
