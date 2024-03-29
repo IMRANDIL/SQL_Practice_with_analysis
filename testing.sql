@@ -86,7 +86,37 @@
 
 -- march job table below
 
-CREATE TABLE march_jobs as
-    SELECT * from job_postings_fact
-    WHERE EXTRACT(MONTH from job_posted_date) = 3
-    and salary_year_avg is not null
+-- CREATE TABLE march_jobs as
+--     SELECT * from job_postings_fact
+--     WHERE EXTRACT(MONTH from job_posted_date) = 3
+--     and salary_year_avg is not null
+
+
+
+
+--- case statement in sql.......practice...needed badly this...
+
+
+/*
+Label new column as follows:
+- 'Anywhere' jobs as 'Remote'
+- 'New York, NY' jobs as 'Local'
+- Otherwise 'Onsite'
+
+
+*/
+
+
+
+
+
+SELECT job_location, 
+job_title_short,
+CASE
+WHEN job_location = 'Anywhere' THEN 'Remote'
+WHEN job_location = 'New York, NY' THEN 'Local'
+ELSE 'Onsite'
+END AS location_category
+from 
+job_postings_fact 
+limit 100;
