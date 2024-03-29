@@ -110,7 +110,9 @@ Label new column as follows:
 
 
 
-SELECT job_location, 
+SELECT 
+COUNT(job_id) as number_of_jobs,
+job_location, 
 job_title_short,
 CASE
 WHEN job_location = 'Anywhere' THEN 'Remote'
@@ -119,4 +121,8 @@ ELSE 'Onsite'
 END AS location_category
 from 
 job_postings_fact 
+GROUP BY
+location_category, job_location, job_title_short
+ORDER BY
+number_of_jobs DESC
 limit 100;
