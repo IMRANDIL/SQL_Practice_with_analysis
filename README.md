@@ -49,6 +49,9 @@ The `skills_demand` Common Table Expression (CTE) calculates the demand for vari
 
 The `Average_salary` CTE computes the average salary associated with each skill, shedding light on the financial rewards linked to specific skill sets. By aggregating salary data and skill information, this CTE offers valuable insights into salary trends across different skills.
 
+# Some Previews
+![Alt text](assets\data_analysis.png)
+
 # Conclusion
 
 This SQL query represents a crucial step towards understanding the job market dynamics. It empowers stakeholders with actionable insights, enabling informed decisions regarding skill acquisition, recruitment strategies, and talent management.
