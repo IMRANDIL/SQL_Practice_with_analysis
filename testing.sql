@@ -368,16 +368,16 @@ helping job seekers understand which skills to develop that align with top salar
 --- top 10 most high paying skills
 
 
-SELECT sd.skills, count(*) as skill_count from 
-job_postings_fact as jpf
-INNER JOIN 
-    skills_job_dim sjd ON jpf.job_id = sjd.job_id
-INNER JOIN 
-    skills_dim sd ON sjd.skill_id = sd.skill_id
-WHERE jpf.salary_year_avg > 200000
-GROUP BY sd.skills
-ORDER BY skill_count desc
-LIMIT 10;
+-- SELECT sd.skills, count(*) as skill_count from 
+-- job_postings_fact as jpf
+-- INNER JOIN 
+--     skills_job_dim sjd ON jpf.job_id = sjd.job_id
+-- INNER JOIN 
+--     skills_dim sd ON sjd.skill_id = sd.skill_id
+-- WHERE jpf.salary_year_avg > 200000
+-- GROUP BY sd.skills
+-- ORDER BY skill_count desc
+-- LIMIT 10;
 
 -- focus on python, sql, spark , aws, azure, and r probably
 
@@ -425,3 +425,37 @@ LIMIT 10;
 --     "skill_count": "85854"
 --   }
 -- ]
+
+
+--- two cte sql query.....
+
+WITH skills_demand AS (
+    SELECT 
+    sd.skills,
+    sd.skill_id, 
+    count(*) as skill_count 
+    from 
+    job_postings_fact as jpf
+    INNER JOIN 
+        skills_job_dim sjd ON jpf.job_id = sjd.job_id
+    INNER JOIN 
+        skills_dim sd ON sjd.skill_id = sd.skill_id
+    WHERE salary_year_avg is not NULL
+    GROUP BY sd.skill_id
+
+), Average_salary As (
+    SELECT
+    sd.skill_id,
+    ROUND(AVG(jpf.salary_year_avg),0) as avg_salary
+    FROM job_postings_fact as jpf
+    INNER JOIN skills_job_dim as sjd on jpf.job_id = sjd.job_id
+    INNER JOIN skills_dim as sd on sd.skill_id = sjd.skill_id
+    WHERE salary_year_avg is not NULL
+    GROUP BY sd.skill_id
+    ORDER BY avg_salary desc
+)
+
+
+SELECT sd.skills, sd.skill_count, avs.avg_salary from skills_demand as sd INNER JOIN Average_salary as avs
+on sd.skill_id = avs.skill_id
+ORDER BY sd.skill_count, avs.avg_salary desc
