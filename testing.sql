@@ -334,30 +334,94 @@ helping job seekers understand which skills to develop that align with top salar
 
 
 
-WITH top_10_paying_jobs AS (
-    SELECT
-        jp.job_id,
-        jp.job_title,
-        cd.name AS company_name,
-        jp.salary_year_avg
-    FROM
-        job_postings_fact AS jp
-    INNER JOIN
-        company_dim AS cd ON cd.company_id = jp.company_id
-    WHERE
-        jp.job_title LIKE '%Data Analyst%'
-        AND jp.salary_year_avg IS NOT NULL
-        AND jp.job_location = 'Anywhere'
-    ORDER BY
-        jp.salary_year_avg DESC 
-    LIMIT 10
-)
+-- WITH top_10_paying_jobs AS (
+--     SELECT
+--         jp.job_id,
+--         jp.job_title,
+--         cd.name AS company_name,
+--         jp.salary_year_avg
+--     FROM
+--         job_postings_fact AS jp
+--     INNER JOIN
+--         company_dim AS cd ON cd.company_id = jp.company_id
+--     WHERE
+--         jp.job_title LIKE '%Data Analyst%'
+--         AND jp.salary_year_avg IS NOT NULL
+--         AND jp.job_location = 'Anywhere'
+--     ORDER BY
+--         jp.salary_year_avg DESC 
+--     LIMIT 10
+-- )
 
-SELECT sd.skills, tp.* 
-FROM 
-    skills_dim sd
+-- SELECT sd.skills, tp.* 
+-- FROM 
+--     skills_dim sd
+-- INNER JOIN 
+--     skills_job_dim sjd ON sd.skill_id = sjd.skill_id
+-- INNER JOIN 
+--     top_10_paying_jobs tp ON tp.job_id = sjd.job_id
+-- LIMIT 10;
+
+
+
+
+--- top 10 most high paying skills
+
+
+SELECT sd.skills, count(*) as skill_count from 
+job_postings_fact as jpf
 INNER JOIN 
-    skills_job_dim sjd ON sd.skill_id = sjd.skill_id
+    skills_job_dim sjd ON jpf.job_id = sjd.job_id
 INNER JOIN 
-    top_10_paying_jobs tp ON tp.job_id = sjd.job_id
+    skills_dim sd ON sjd.skill_id = sd.skill_id
+WHERE jpf.salary_year_avg > 200000
+GROUP BY sd.skills
+ORDER BY skill_count desc
 LIMIT 10;
+
+-- focus on python, sql, spark , aws, azure, and r probably
+
+---below is the result
+
+-- [
+--   {
+--     "skills": "sql",
+--     "skill_count": "385750"
+--   },
+--   {
+--     "skills": "python",
+--     "skill_count": "381863"
+--   },
+--   {
+--     "skills": "aws",
+--     "skill_count": "145718"
+--   },
+--   {
+--     "skills": "azure",
+--     "skill_count": "132851"
+--   },
+--   {
+--     "skills": "r",
+--     "skill_count": "131285"
+--   },
+--   {
+--     "skills": "tableau",
+--     "skill_count": "127500"
+--   },
+--   {
+--     "skills": "excel",
+--     "skill_count": "127341"
+--   },
+--   {
+--     "skills": "spark",
+--     "skill_count": "114928"
+--   },
+--   {
+--     "skills": "power bi",
+--     "skill_count": "98363"
+--   },
+--   {
+--     "skills": "java",
+--     "skill_count": "85854"
+--   }
+-- ]
