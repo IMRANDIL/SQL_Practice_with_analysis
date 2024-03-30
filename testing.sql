@@ -458,4 +458,5 @@ WITH skills_demand AS (
 
 SELECT sd.skills, sd.skill_count, avs.avg_salary from skills_demand as sd INNER JOIN Average_salary as avs
 on sd.skill_id = avs.skill_id
-ORDER BY sd.skill_count, avs.avg_salary desc
+WHERE sd.skill_count > 10
+ORDER BY sd.skill_count desc, avs.avg_salary desc
