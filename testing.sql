@@ -264,29 +264,100 @@ Question: What are the top-paying data analyst jobs?
 */
 
 
-SELECT job_id,
-job_title,
-job_location,
-company_dim.name as company_name,
-job_schedule_type,
-salary_year_avg,
-job_posted_date::DATE
-FROM
-    job_postings_fact
-    INNER JOIN company_dim
-    ON
-    company_dim.company_id = job_postings_fact.company_id
-WHERE
-    job_title LIKE '%Data Analyst%'
-    and salary_year_avg is not NULL
-    and job_location = 'Anywhere'
-    ORDER BY salary_year_avg desc 
-    LIMIT 10;
+-- SELECT job_id,
+-- job_title,
+-- job_location,
+-- company_dim.name as company_name,
+-- job_schedule_type,
+-- salary_year_avg,
+-- job_posted_date::DATE
+-- FROM
+--     job_postings_fact
+--     INNER JOIN company_dim
+--     ON
+--     company_dim.company_id = job_postings_fact.company_id
+-- WHERE
+--     job_title LIKE '%Data Analyst%'
+--     and salary_year_avg is not NULL
+--     and job_location = 'Anywhere'
+--     ORDER BY salary_year_avg desc 
+--     LIMIT 10;
     
 
 
 
+--- another problem
+
+/*
+Question: What skills are required for the top-paying data analyst jobs?
+
+- Use the top 10 highest-paying Data Analyst jobs from first query
+- Add the specific skills required for these roles
+- why? It provides a detailed look at which high-paying jobs demand certain skills,
+helping job seekers understand which skills to develop that align with top salaries.
+
+*/
 
 
 
+-- WITH top_10_paying_jobs AS (
+--     SELECT
+--         jp.job_id,
+--         jp.job_title,
+--         cd.name AS company_name,
+--         jp.salary_year_avg
+--     FROM
+--         job_postings_fact AS jp
+--     INNER JOIN
+--         company_dim AS cd ON cd.company_id = jp.company_id
+--     WHERE
+--         jp.job_title LIKE '%Data Analyst%'
+--         AND jp.salary_year_avg IS NOT NULL
+--         AND jp.job_location = 'Anywhere'
+--     ORDER BY
+--         jp.salary_year_avg DESC 
+--     LIMIT 10
+-- )
 
+-- SELECT
+--     tp.*,
+--     ARRAY_TO_STRING(ARRAY_AGG(sjd.skill_id), ',') AS skill_ids
+-- FROM
+--     top_10_paying_jobs AS tp
+-- INNER JOIN
+--     skills_job_dim AS sjd ON sjd.job_id = tp.job_id
+-- GROUP BY
+--     tp.job_id, tp.job_title, tp.company_name, tp.salary_year_avg
+-- ORDER BY
+--     tp.salary_year_avg DESC
+-- LIMIT 10;
+
+
+
+WITH top_10_paying_jobs AS (
+    SELECT
+        jp.job_id,
+        jp.job_title,
+        cd.name AS company_name,
+        jp.salary_year_avg
+    FROM
+        job_postings_fact AS jp
+    INNER JOIN
+        company_dim AS cd ON cd.company_id = jp.company_id
+    WHERE
+        jp.job_title LIKE '%Data Analyst%'
+        AND jp.salary_year_avg IS NOT NULL
+        AND jp.job_location = 'Anywhere'
+    ORDER BY
+        jp.salary_year_avg DESC 
+    LIMIT 10
+)
+
+SELECT sd.skills, tp.* 
+FROM 
+    skills_dim sd
+INNER JOIN 
+    skills_job_dim sjd ON sd.skill_id = sjd.skill_id
+INNER JOIN 
+    top_10_paying_jobs tp ON tp.job_id = sjd.job_id
+LIMIT 10;
